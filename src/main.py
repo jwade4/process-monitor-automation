@@ -2,6 +2,8 @@ import psutil
 from datetime import datetime
 import os
 import csv
+import tkinter as tk
+from tkinter import messagebox
 
 
 def scan_processes():
@@ -117,12 +119,27 @@ def save_report(flagged_processes, output_dir=os.path.join(os.path.expanduser("~
         writer.writerows(cleaned_data)
     
     print(f"Report sucessfully saved to: {filepath}")
-    return None 
+    return filepath
 
-#test_flag_processes()
-#test_evaluate_process()
+def notify_user(filepath):
+    if filepath is None:
+        return
+    
+    root = tk.Tk()
+    root.withdraw()
+
+    messagebox.showinfo("Process Monitor", f"Report saved successfully to:\n{filepath}")
+
+    root.destroy()
+
+    return None
+
+test_flag_processes()
+test_evaluate_process()
 all_processes = scan_processes()
+assert isinstance(all_processes, list)
 flagged = flag_processes(all_processes)
-save_report(flagged)
+report_path = save_report(flagged)
+notify_user(report_path)
 #for p in flagged:
 #    print(p)
