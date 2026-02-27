@@ -1,4 +1,3 @@
-import pytest
 from src.process_logic import scan_processes, flag_processes, evaluate_process
 
 def test_evaluate_process():
