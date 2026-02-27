@@ -3,13 +3,23 @@ import os
 from datetime import datetime
 import sys
 
-# ===== Logs folder =====
-LOG_DIR = os.path.join(os.path.dirname(__file__), "..", "logs")
-# No need to create if already exists
+# ===== Determine base folder =====
+if getattr(sys, "frozen", False):
+    # Running as PyInstaller EXE
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    # Running as normal Python script
+    BASE_DIR = os.path.dirname(__file__)
 
+# ===== Logs folder next to EXE =====
+LOG_DIR = os.path.join(BASE_DIR, "logs")
+os.makedirs(LOG_DIR, exist_ok=True)
+
+# ===== Log file with date =====
 timestamp = datetime.now().strftime("%Y-%m-%d")
 LOG_FILE = os.path.join(LOG_DIR, f"app_log_{timestamp}.log")
 
+# ===== Configure logging =====
 logging.basicConfig(
     filename=LOG_FILE,
     level=logging.INFO,
