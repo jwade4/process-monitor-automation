@@ -1,29 +1,44 @@
-import os
-import tempfile
+import unittest
+from src.report import make_csv_report
 
-from src.report import send_report
-"""
-def test_save_report_csv_created():
-    flagged = [
-        {
-            "pid": 123,
-            "name": "malware.exe",
-            "memory_mb": 800,
-            "cpu_percent": 95,
-            "suspicious": True,
-            "reason": ["High memory usage", "High CPU usage"]
-        }
-    ]
+class TestMakeCSVReport(unittest.TestCase):
 
-    with tempfile.TemporaryDirectory() as temp_dir:
-        filepath = send_report(flagged, output_dir=temp_dir)
+    def test_csv_created(self):
+        flagged = [
+            {
+                "pid": 123,
+                "name": "malware.exe",
+                "memory": 800,
+                "cpu_percent": 95,
+                "suspicious": True,
+                "reason": ["High memory usage", "High CPU usage"]
+            }
+        ]
 
-        assert filepath is not None
-        assert os.path.exists(filepath)
+        csv_content, filename = make_csv_report(flagged)
 
-        assert os.path.getsize(filepath) > 0
+        # CSV content should exist
+        self.assertIsNotNone(csv_content)
+        self.assertTrue(len(csv_content) > 0)
 
-def test_save_report_empty():
-    result = send_report([])
-    assert result is None
-"""
+        # Filename should exist and end with .csv
+        self.assertIsNotNone(filename)
+        self.assertTrue(filename.endswith(".csv"))
+
+        # CSV header includes all keys
+        header = csv_content.strip().split("\n")[0]
+        expected_keys = ["pid", "name", "memory", "cpu_percent", "suspicious", "reason"]
+        for key in expected_keys:
+            self.assertIn(key, header)
+
+        # Check that reasons are joined properly
+        self.assertIn("High memory usage; High CPU usage", csv_content)
+
+    def test_csv_empty_list(self):
+        csv_content, filename = make_csv_report([])
+        self.assertIsNone(csv_content)
+        self.assertIsNone(filename)
+
+
+if __name__ == "__main__":
+    unittest.main()
